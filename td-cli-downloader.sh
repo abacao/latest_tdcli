@@ -8,15 +8,16 @@
 OAUTH_TOKEN="$BUNDLE_GITHUB__COM"                                     # Your oauth token
 OWNER="Talkdesk"                                                      # Repo owner (org id)
 REPO="td-cli"                                                         # Repo name
-FILE_NAME="td-linux-amd64.tar.gz" || "td-darwin-amd64.tar.gz"         # The file name expected to download. This is deleted before curl pulls down a new one
 API_URL="https://$OAUTH_TOKEN:@api.github.com/repos/$OWNER/$REPO"     # Building the API URL
 
 # Determines if you are using MAC or LINUX and choose the proper download file.
 os_type=`uname`
 if  [ "$os_type" = "Linux" ]; then
-  ASSET_ID=$(curl $API_URL/releases/latest | jq -r '.assets[1].id')
+  FILE_NAME="td-linux-amd64.tar.gz";                                   # Filename for Linux
+  ASSET_ID=$(curl $API_URL/releases/latest | jq -r '.assets[1].id');
 elif [ "$os_type" = "Darwin" ]; then
-  ASSET_ID=$(curl $API_URL/releases/latest | jq -r '.assets[0].id')
+  FILE_NAME="td-darwin-amd64.tar.gz"                                   # Filename for Linux
+  ASSET_ID=$(curl $API_URL/releases/latest | jq -r '.assets[0].id');
 else
     echo "${os_type} is not supported" >&2
     exit 1
@@ -27,3 +28,5 @@ echo "Asset ID: $ASSET_I";
 rm -f $FILE_NAME
 # getting release
 curl -O -J -L -H "Accept: application/octet-stream" "$API_URL/releases/assets/$ASSET_ID"
+tar -xvf $FILE_NAME
+rm -f $FILE_NAME
